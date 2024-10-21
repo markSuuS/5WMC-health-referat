@@ -48,7 +48,7 @@ quarkus ext add io.quarkus:quarkus-smallrye-health
 </dependency>
 ----
 
-== First attempts
+== First attempts with existing health checks endpoints
 
 === Start the project
 
@@ -63,8 +63,6 @@ quarkus dev --clean
 ----
 ./mvnw clean quarkus:dev
 ----
-
-=== Existing health checks endpoints
 
 Importing the smallrye-health extension directly exposes three REST endpoints:
 
@@ -84,7 +82,7 @@ All health REST endpoints return a simple JSON object with two fields:
 .Example: Accumulating all health check procedures in the application
 [source, bash]
 ----
-curl http://localhost:8080/q/health/live
+curl http://localhost:8080/q/health
 ----
 
 .Response of /q/health/live
@@ -104,6 +102,8 @@ curl http://localhost:8080/q/health/live
 You can also create your own health checks to announce the availability of your own program parts using own health check classes.
 
 === Liveness-Check
+
+These checks appear in the endpoint `/q/health/live`
 
 ==== Create class `LivenessCheck`
 
@@ -140,13 +140,13 @@ public class LivenessCheck implements HealthCheck { <3>
 ----
 <1> `@Liveness` annotation means that the check is a Liveness-Check and exposes the result on `/q/health/live`.
 <2> It’s recommended to annotate the health check class with `@ApplicationScoped` so that a single bean instance is used for all health check requests.
-<3> Your health check class needs to implement the `HealthCheck` interface.
+<3> Your health check class needs to implement the `HealthCheck` interface. This means you have to override the `call` method.
 <4> This is the condition whether the check is up or down. Here in the demo example we use a random boolean
 <5> Here you return the name of your health check with `HealthCheckResponse.up` or `HealthCheckResponse.down`
 
 ==== Get response of LivenessCheck
 
-.Accumulating all health check procedures in the application
+.Accumulating liveness health check procedures in the application
 [source, bash]
 ----
 curl http://localhost:8080/q/health/live
@@ -160,6 +160,71 @@ curl http://localhost:8080/q/health/live
     "checks": [
         {
             "name": "liveness-check",
+            "status": "DOWN"
+        }
+    ]
+}
+----
+
+=== Readiness-Check
+
+These checks appear in the endpoint `/q/health/ready`
+
+==== Create class `ReadinessCheck`
+
+image::create-class-readinesscheck.png[]
+
+==== Implement class `ReadinessCheck`
+
+[source,java]
+----
+package at.htlleonding.health;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Readiness;
+
+import java.util.Random;
+
+@Readiness <1>
+@ApplicationScoped <2>
+public class ReadinessCheck implements HealthCheck { <3>
+    @Override
+    public HealthCheckResponse call() {
+        boolean isUp = new Random().nextBoolean(); <4>
+
+        if(isUp) { <5>
+            return HealthCheckResponse.up("readiness-check");
+        } else {
+            return HealthCheckResponse.down("readiness-check");
+        }
+    }
+}
+
+----
+<1> `@Readiness` annotation means that the check is a Readiness-Check and exposes the result on `/q/health/ready`.
+<2> It’s recommended to annotate the health check class with `@ApplicationScoped` so that a single bean instance is used for all health check requests.
+<3> Your health check class needs to implement the `HealthCheck` interface. This means you have to override the `call` method.
+<4> This is the condition whether the check is up or down. Here in the demo example we use a random boolean.
+<5> Here you return the name of your health check with `HealthCheckResponse.up` or `HealthCheckResponse.down`.
+
+==== Get response of ReadinessCheck
+
+.Accumulating readiness health check procedures in the application
+[source, bash]
+----
+curl http://localhost:8080/q/health/ready
+----
+
+.Response of /q/health/ready
+[source, json]
+----
+{
+    "status": "DOWN",
+    "checks": [
+        {
+            "name": "readiness-check",
             "status": "DOWN"
         }
     ]
