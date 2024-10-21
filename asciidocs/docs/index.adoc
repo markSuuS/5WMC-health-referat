@@ -1,7 +1,9 @@
-= SmallRye Health
+= SmallRye Health in Quarkus
 ifndef::imagesdir[:imagesdir: images]
 
 SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments where automated processes must be able to determine whether the application should be discarded or restarted.
+
+*In this instruction, i will show you how to use it in Quarkus.*
 
 == Prerequisites
 To complete this guide, you need:
@@ -17,11 +19,11 @@ To complete this guide, you need:
 
 image::create-project.png[]
 
-image::required-extensions.png[]
-
 TIP: SmallRye Health extension needed
 
-* _or add to existing project using_
+image::required-extensions.png[]
+
+* _or add to existing project_
 
 .Quarkus-CLI
 [source, bash]
@@ -34,3 +36,65 @@ quarkus ext add io.quarkus:quarkus-smallrye-health
 ----
 ./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-smallrye-health"
 ----
+
+.pom.xml
+[source, xml]
+----
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-smallrye-health</artifactId>
+</dependency>
+----
+
+== First attempts
+
+=== Start the project
+
+.Quarkus-CLI
+[source, bash]
+----
+quarkus dev --clean
+----
+
+.Maven-Wrapper
+[source, bash]
+----
+./mvnw clean quarkus:dev
+----
+
+=== Existing health checks endpoints
+
+Importing the smallrye-health extension directly exposes three REST endpoints:
+
+* link:localhost:8080/q/health/live[`/q/health/live`] - The application is up and running.
+* link:localhost:8080/q/health/ready[`/q/health/ready`] - The application is ready to serve requests.
+* link:localhost:8080/q/health/started[`/q/health/started`] - The application is started.
+* link:localhost:8080/q/health[`/q/health`] - Accumulating all health check procedures in the application.
+
+All health REST endpoints return a simple JSON object with two fields:
+
+* `status` - the overall result of all the health check procedures
+
+* `checks` - an array of individual checks
+
+=== Use existing health checks endpoints
+
+[source, bash]
+----
+curl http://localhost:8080/q/health/live
+----
+
+[source, json]
+----
+{
+    "status": "UP",
+    "checks": [
+        {
+            "name": "alive",
+            "status": "UP"
+        }
+    ]
+}
+----
+
+*Now try it yourself with the other existing endpoints :-)*
