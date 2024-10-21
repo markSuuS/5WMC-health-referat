@@ -74,6 +74,8 @@ Importing the smallrye-health extension directly exposes three REST endpoints:
 All health REST endpoints return a simple JSON object with two fields:
 
 * `status` - the overall result of all the health check procedures
+** `UP` - all checks are up
+** `DOWN` - one or more checks are down
 
 * `checks` - an array of individual checks
 
@@ -226,6 +228,70 @@ curl http://localhost:8080/q/health/ready
         {
             "name": "readiness-check",
             "status": "DOWN"
+        }
+    ]
+}
+----
+
+=== Startup-Check
+These checks appear in the endpoint `/q/health/started`
+
+==== Create class `StartupCheck`
+
+image::create-class-startupcheck.png[]
+
+==== Implement class `StartupCheck`
+
+[source, java]
+----
+package at.htlleonding.health;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Startup;
+
+import java.util.Random;
+
+@Startup <1>
+@ApplicationScoped <2>
+public class StartupCheck implements HealthCheck { <3>
+    @Override
+    public HealthCheckResponse call() {
+        boolean isUp = new Random().nextBoolean(); <4>
+
+        if(isUp) { <5>
+            return HealthCheckResponse.up("startup-check");
+        } else {
+            return HealthCheckResponse.down("startup-check");
+        }
+    }
+}
+
+----
+<1> `@Startup` annotation means that the check is a Startup-Check and exposes the result on `/q/health/started`.
+<2> It’s recommended to annotate the health check class with `@ApplicationScoped` so that a single bean instance is used for all health check requests.
+<3> Your health check class needs to implement the `HealthCheck` interface. This means you have to override the `call` method.
+<4> This is the condition whether the check is up or down. Here in the demo example we use a random boolean.
+<5> Here you return the name of your health check with `HealthCheckResponse.up` or `HealthCheckResponse.down`.
+
+==== Get response of ReadinessCheck
+
+.Accumulating startup health check procedures in the application
+[source, bash]
+----
+curl http://localhost:8080/q/health/started
+----
+
+.Response of /q/health/started
+[source, json]
+----
+{
+    "status": "UP",
+    "checks": [
+        {
+            "name": "startup-check",
+            "status": "UP"
         }
     ]
 }
