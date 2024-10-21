@@ -570,16 +570,17 @@ pre.rouge .gs {
 <li><a href="#_smallrye_health_extension">2.1. SmallRye Health extension</a></li>
 </ul>
 </li>
-<li><a href="#_first_attempts">3. First attempts</a>
+<li><a href="#_first_attempts_with_existing_health_checks_endpoints">3. First attempts with existing health checks endpoints</a>
 <ul class="sectlevel2">
 <li><a href="#_start_the_project">3.1. Start the project</a></li>
-<li><a href="#_existing_health_checks_endpoints">3.2. Existing health checks endpoints</a></li>
-<li><a href="#_use_existing_health_checks_endpoints">3.3. Use existing health checks endpoints</a></li>
+<li><a href="#_use_existing_health_checks_endpoints">3.2. Use existing health checks endpoints</a></li>
 </ul>
 </li>
 <li><a href="#_individual_health_checks">4. Individual Health Checks</a>
 <ul class="sectlevel2">
 <li><a href="#_liveness_check">4.1. Liveness-Check</a></li>
+<li><a href="#_readiness_check">4.2. Readiness-Check</a></li>
+<li><a href="#_startup_check">4.3. Startup-Check</a></li>
 </ul>
 </li>
 </ul>
@@ -680,7 +681,7 @@ pre.rouge .gs {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_first_attempts"><a class="anchor" href="#_first_attempts"></a>3. First attempts</h2>
+<h2 id="_first_attempts_with_existing_health_checks_endpoints"><a class="anchor" href="#_first_attempts_with_existing_health_checks_endpoints"></a>3. First attempts with existing health checks endpoints</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_start_the_project"><a class="anchor" href="#_start_the_project"></a>3.1. Start the project</h3>
@@ -696,9 +697,6 @@ pre.rouge .gs {
 <pre class="rouge highlight"><code data-lang="bash">./mvnw clean quarkus:dev</code></pre>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_existing_health_checks_endpoints"><a class="anchor" href="#_existing_health_checks_endpoints"></a>3.2. Existing health checks endpoints</h3>
 <div class="paragraph">
 <p>Importing the smallrye-health extension directly exposes three REST endpoints:</p>
 </div>
@@ -725,6 +723,16 @@ pre.rouge .gs {
 <ul>
 <li>
 <p><code>status</code> - the overall result of all the health check procedures</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>UP</code> - all checks are up</p>
+</li>
+<li>
+<p><code>DOWN</code> - one or more checks are down</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p><code>checks</code> - an array of individual checks</p>
@@ -733,11 +741,11 @@ pre.rouge .gs {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_use_existing_health_checks_endpoints"><a class="anchor" href="#_use_existing_health_checks_endpoints"></a>3.3. Use existing health checks endpoints</h3>
+<h3 id="_use_existing_health_checks_endpoints"><a class="anchor" href="#_use_existing_health_checks_endpoints"></a>3.2. Use existing health checks endpoints</h3>
 <div class="listingblock">
 <div class="title">Example: Accumulating all health check procedures in the application</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/q/health/live</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/q/health</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -764,6 +772,9 @@ pre.rouge .gs {
 </div>
 <div class="sect2">
 <h3 id="_liveness_check"><a class="anchor" href="#_liveness_check"></a>4.1. Liveness-Check</h3>
+<div class="paragraph">
+<p>These checks appear in the endpoint <code>/q/health/live</code></p>
+</div>
 <div class="sect3">
 <h4 id="_create_class_livenesscheck"><a class="anchor" href="#_create_class_livenesscheck"></a>4.1.1. Create class <code>LivenessCheck</code></h4>
 <div class="imageblock">
@@ -813,7 +824,7 @@ pre.rouge .gs {
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Your health check class needs to implement the <code>HealthCheck</code> interface.</td>
+<td>Your health check class needs to implement the <code>HealthCheck</code> interface. This means you have to override the <code>call</code> method.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -829,7 +840,7 @@ pre.rouge .gs {
 <div class="sect3">
 <h4 id="_get_response_of_livenesscheck"><a class="anchor" href="#_get_response_of_livenesscheck"></a>4.1.3. Get response of LivenessCheck</h4>
 <div class="listingblock">
-<div class="title">Accumulating all health check procedures in the application</div>
+<div class="title">Accumulating liveness health check procedures in the application</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/q/health/live</code></pre>
 </div>
@@ -850,12 +861,194 @@ pre.rouge .gs {
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_readiness_check"><a class="anchor" href="#_readiness_check"></a>4.2. Readiness-Check</h3>
+<div class="paragraph">
+<p>These checks appear in the endpoint <code>/q/health/ready</code></p>
+</div>
+<div class="sect3">
+<h4 id="_create_class_readinesscheck"><a class="anchor" href="#_create_class_readinesscheck"></a>4.2.1. Create class <code>ReadinessCheck</code></h4>
+<div class="imageblock">
+<div class="content">
+<img src="images/create-class-readinesscheck.png" alt="create class readinesscheck">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_implement_class_readinesscheck"><a class="anchor" href="#_implement_class_readinesscheck"></a>4.2.2. Implement class <code>ReadinessCheck</code></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">at.htlleonding.health</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.enterprise.context.ApplicationScoped</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.HealthCheck</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.HealthCheckResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.Readiness</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
+
+<span class="nd">@Readiness</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@ApplicationScoped</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ReadinessCheck</span> <span class="kd">implements</span> <span class="nc">HealthCheck</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">HealthCheckResponse</span> <span class="nf">call</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kt">boolean</span> <span class="n">isUp</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Random</span><span class="o">().</span><span class="na">nextBoolean</span><span class="o">();</span> <i class="conum" data-value="4"></i><b>(4)</b>
+
+        <span class="k">if</span><span class="o">(</span><span class="n">isUp</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="5"></i><b>(5)</b>
+            <span class="k">return</span> <span class="nc">HealthCheckResponse</span><span class="o">.</span><span class="na">up</span><span class="o">(</span><span class="s">"readiness-check"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="nc">HealthCheckResponse</span><span class="o">.</span><span class="na">down</span><span class="o">(</span><span class="s">"readiness-check"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Readiness</code> annotation means that the check is a Readiness-Check and exposes the result on <code>/q/health/ready</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It’s recommended to annotate the health check class with <code>@ApplicationScoped</code> so that a single bean instance is used for all health check requests.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Your health check class needs to implement the <code>HealthCheck</code> interface. This means you have to override the <code>call</code> method.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>This is the condition whether the check is up or down. Here in the demo example we use a random boolean.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Here you return the name of your health check with <code>HealthCheckResponse.up</code> or <code>HealthCheckResponse.down</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_get_response_of_readinesscheck"><a class="anchor" href="#_get_response_of_readinesscheck"></a>4.2.3. Get response of ReadinessCheck</h4>
+<div class="listingblock">
+<div class="title">Accumulating readiness health check procedures in the application</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/q/health/ready</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Response of /q/health/ready</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DOWN"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"checks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"readiness-check"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DOWN"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_startup_check"><a class="anchor" href="#_startup_check"></a>4.3. Startup-Check</h3>
+<div class="paragraph">
+<p>These checks appear in the endpoint <code>/q/health/started</code></p>
+</div>
+<div class="sect3">
+<h4 id="_create_class_startupcheck"><a class="anchor" href="#_create_class_startupcheck"></a>4.3.1. Create class <code>StartupCheck</code></h4>
+<div class="imageblock">
+<div class="content">
+<img src="images/create-class-startupcheck.png" alt="create class startupcheck">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_implement_class_startupcheck"><a class="anchor" href="#_implement_class_startupcheck"></a>4.3.2. Implement class <code>StartupCheck</code></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">at.htlleonding.health</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.enterprise.context.ApplicationScoped</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.HealthCheck</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.HealthCheckResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.Startup</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
+
+<span class="nd">@Startup</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@ApplicationScoped</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StartupCheck</span> <span class="kd">implements</span> <span class="nc">HealthCheck</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">HealthCheckResponse</span> <span class="nf">call</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kt">boolean</span> <span class="n">isUp</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Random</span><span class="o">().</span><span class="na">nextBoolean</span><span class="o">();</span> <i class="conum" data-value="4"></i><b>(4)</b>
+
+        <span class="k">if</span><span class="o">(</span><span class="n">isUp</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="5"></i><b>(5)</b>
+            <span class="k">return</span> <span class="nc">HealthCheckResponse</span><span class="o">.</span><span class="na">up</span><span class="o">(</span><span class="s">"startup-check"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="nc">HealthCheckResponse</span><span class="o">.</span><span class="na">down</span><span class="o">(</span><span class="s">"startup-check"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Startup</code> annotation means that the check is a Startup-Check and exposes the result on <code>/q/health/started</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It’s recommended to annotate the health check class with <code>@ApplicationScoped</code> so that a single bean instance is used for all health check requests.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Your health check class needs to implement the <code>HealthCheck</code> interface. This means you have to override the <code>call</code> method.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>This is the condition whether the check is up or down. Here in the demo example we use a random boolean.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Here you return the name of your health check with <code>HealthCheckResponse.up</code> or <code>HealthCheckResponse.down</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_get_response_of_readinesscheck_2"><a class="anchor" href="#_get_response_of_readinesscheck_2"></a>4.3.3. Get response of ReadinessCheck</h4>
+<div class="listingblock">
+<div class="title">Accumulating startup health check procedures in the application</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/q/health/started</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Response of /q/health/started</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UP"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"checks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"startup-check"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UP"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-21 08:29:07 UTC
+Last updated 2024-10-21 08:53:44 UTC
 </div>
 </div>
 </body>
