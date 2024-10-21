@@ -1,4 +1,36 @@
-= Index page
+= SmallRye Health
 ifndef::imagesdir[:imagesdir: images]
 
-image::img.png[]
+SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments where automated processes must be able to determine whether the application should be discarded or restarted.
+
+== Prerequisites
+To complete this guide, you need:
+
+* Roughly 15 minutes
+* An IDE
+* JDK 17+ installed with JAVA_HOME configured appropriately
+* Apache Maven 3.9.8
+* Optionally the Quarkus CLI if you want to use it
+* Optionally Mandrel or GraalVM installed and configured appropriately if you want to build a native executable (or Docker if you use a native container build)
+
+== Creating the Maven Project
+
+image::create-project.png[]
+
+image::required-extensions.png[]
+
+TIP: SmallRye Health extension needed
+
+* _or add to existing project using_
+
+.Quarkus-CLI
+[source, bash]
+----
+quarkus ext add io.quarkus:quarkus-smallrye-health
+----
+
+.Maven-Wrapper
+[source, bash]
+----
+./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-smallrye-health"
+----
