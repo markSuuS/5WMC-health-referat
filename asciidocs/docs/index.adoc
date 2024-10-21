@@ -1,5 +1,7 @@
 = SmallRye Health in Quarkus
 ifndef::imagesdir[:imagesdir: images]
+:stylesheet: adoc.css
+:pdf-style: adoc.css
 :toc:
 :icons: font
 :experimental:
@@ -433,7 +435,7 @@ public class DatabaseHealthCheck implements HealthCheck {
 5: if everything works, it returns a `HealthCheckResponse.up` with `database-connection-active` as name
 6: if something fails, it returns a `HealthCheckResponse.down` with `database-connection-active` as name
 
-==== Launch the application
+=== Launch the application and watch the results
 
 .Quarkus-CLI
 [source, bash]
