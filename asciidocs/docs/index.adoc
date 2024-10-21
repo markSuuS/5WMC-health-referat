@@ -303,8 +303,10 @@ curl http://localhost:8080/q/health/started
 
 == Individual Health Check: Example with Database connection
 
+IMPORTANT: Stop the Quarkus application to avoid any problems.
+
 === Database Setup
-run the following script to start a PostgreSQL database in Docker
+* run the following script to start a PostgreSQL database in Docker
 
 [source, bash]
 ----
@@ -318,7 +320,7 @@ docker run --rm \
            postgres:16.3-alpine
 ----
 
-or use https://edufs.edu.htl-leonding.ac.at/~t.stuetz/download/nvs/scripts/postgres-16.3/postgres-run-in-docker.sh[this] download link and run the script with
+* or use https://edufs.edu.htl-leonding.ac.at/~t.stuetz/download/nvs/scripts/postgres-16.3/postgres-run-in-docker.sh[this] download link and run the script with
 
 [source, bash]
 ----
@@ -326,7 +328,9 @@ chmod u+x ./postgres-run-in-docker.sh
 ./postgres-run-in-docker.sh
 ----
 
-paste following properties in your application.properties in the Quarkus project
+=== Setup Quarkus application for database usage
+
+* paste following properties for the PostgreSQL database connection in your application.properties in the Quarkus project
 
 .application.properties
 [source,properties]
@@ -339,4 +343,42 @@ quarkus.datasource.jdbc.url = jdbc:postgresql://localhost:5432/db
 
 # drop and create the database at startup (use `update` to only update the schema)
 quarkus.hibernate-orm.database.generation=drop-and-create
+----
+
+* if you use a GitHub-Repository, add following clause to your .gitignore, to exclude all database files
+
+[source,gitignore]
+----
+**/db-postgres/
+----
+
+* add dependencies for the database connection (JDBC, Hibernate, Panache)
+
+.Quarkus-CLI
+[source, bash]
+----
+quarkus ext add io.quarkus:quarkus-jdbc-postgresql
+quarkus ext add io.quarkus:quarkus-hibernate-orm-rest-data-panache
+----
+
+.Maven-Wrapper
+[source, bash]
+----
+./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-jdbc-postgresql"
+./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-hibernate-orm-rest-data-panache"
+----
+
+* or paste following dependency snippets to your `pom.xml`:
+
+.pom.xml
+[source, xml]
+----
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-jdbc-postgresql</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-hibernate-orm-rest-data-panache</artifactId>
+</dependency>
 ----
