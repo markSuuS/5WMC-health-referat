@@ -426,3 +426,56 @@ public class DatabaseHealthCheck implements HealthCheck {
     }
 }
 ----
+1: for database checks, we use Readiness-Checks
+2: the existing configured database connection will be injected in this variable (java.sql.Datasource dataSource)
+3: we try to get the connection
+4: then it will be checked if the connection is valid
+5: if everything works, it returns a `HealthCheckResponse.up` with `database-connection-active` as name
+6: if something fails, it returns a `HealthCheckResponse.down` with `database-connection-active` as name
+
+==== Launch the application
+
+.Quarkus-CLI
+[source, bash]
+----
+quarkus dev --clean
+----
+
+.Maven-Wrapper
+[source, bash]
+----
+./mvnw clean quarkus:dev
+----
+
+==== Explore the results
+
+[source,bash]
+----
+curl http://localhost:8080/q/health/ready
+----
+
+[source, json]
+----
+{
+    "status": "DOWN",
+    "checks": [
+        {
+            "name": "Database connections health check",
+            "status": "DOWN",
+            "data": {
+                "<default>": "Unable to execute the validation check for the default DataSource: Connection to localhost:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections."
+            }
+        },
+        {
+            "name": "database-connection-active",
+            "status": "DOWN"
+        },
+        {
+            "name": "readiness-check",
+            "status": "DOWN"
+        }
+    ]
+}
+----
+
+TIP: Surprisingly, in addition to our own implemented database check, there is already a pre-implemented database check by SmallRye
