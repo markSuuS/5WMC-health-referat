@@ -1,8 +1,8 @@
-# datasource configuration
-quarkus.datasource.db-kind = postgresql
-quarkus.datasource.username = app
-quarkus.datasource.password = app
-quarkus.datasource.jdbc.url = jdbc:postgresql://localhost:5432/db
-
-# drop and create the database at startup (use `update` to only update the schema)
-quarkus.hibernate-orm.database.generation=drop-and-create
+docker run --rm \
+           --name postgres-db \
+           -e POSTGRES_USER=app \
+           -e POSTGRES_PASSWORD=app \
+           -e POSTGRES_DB=db \
+           -v ${PWD}/db-postgres/db:/var/lib/postgresql/data \
+           -p 5432:5432 \
+           postgres:16.3-alpine

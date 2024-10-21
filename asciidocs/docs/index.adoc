@@ -324,11 +324,11 @@ docker run --rm \
 
 [source, bash]
 ----
-chmod u+x ./postgres-run-in-docker.sh
+chmod u+x postgres-run-in-docker.sh
 ./postgres-run-in-docker.sh
 ----
 
-=== Setup Quarkus application for database usage
+=== Prepare Quarkus application for database usage
 
 * paste following properties for the PostgreSQL database connection in your application.properties in the Quarkus project
 
@@ -381,4 +381,48 @@ quarkus ext add io.quarkus:quarkus-hibernate-orm-rest-data-panache
     <groupId>io.quarkus</groupId>
     <artifactId>quarkus-hibernate-orm-rest-data-panache</artifactId>
 </dependency>
+----
+
+=== Create the health check for the database connection
+
+NOTE: Unfortunately, JPA/Hibernate and Panache do not have any pre-programmed functions to determine the availability of the database. Therefore, we send a simple native query to the database (SELECT 1) to test whether the connection exists.
+
+==== Create class `DatabaseHealthCheck`
+
+image::create-class-databasehealthcheck.png[]
+
+==== Implement class `DatabaseHealthCheck`
+
+[source, java]
+----
+package at.htlleonding.health;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Readiness;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+
+@Readiness <1>
+@ApplicationScoped
+public class DatabaseHealthCheck implements HealthCheck {
+    @Inject
+    DataSource dataSource; <2>
+
+    @Override
+    public HealthCheckResponse call() {
+        try(Connection connection = dataSource.getConnection()) { <3>
+            if(!connection.isValid(2)){ <4>
+                throw new Exception("invalid connection after calling connection.isValid with a timeout of 2s");
+            }
+
+            return HealthCheckResponse.up("database-connection-active"); <5>
+        } catch (Exception e) {
+            return HealthCheckResponse.down("database-connection-active"); <6>
+        }
+    }
+}
 ----
