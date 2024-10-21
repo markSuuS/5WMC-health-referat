@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.20">
 <link rel="icon" type="image/png" href="themes/favicon.png">
-<title>Index page</title>
+<title>SmallRye Health in Quarkus</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -435,6 +435,120 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge, pre.rouge .w {
+  color: #24292f;
+  background-color: #f6f8fa;
+}
+pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
+  color: #cf222e;
+}
+pre.rouge .gr {
+  color: #f6f8fa;
+}
+pre.rouge .gd {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+pre.rouge .nb {
+  color: #953800;
+}
+pre.rouge .nc {
+  color: #953800;
+}
+pre.rouge .no {
+  color: #953800;
+}
+pre.rouge .nn {
+  color: #953800;
+}
+pre.rouge .sr {
+  color: #116329;
+}
+pre.rouge .na {
+  color: #116329;
+}
+pre.rouge .nt {
+  color: #116329;
+}
+pre.rouge .gi {
+  color: #116329;
+  background-color: #dafbe1;
+}
+pre.rouge .kc {
+  color: #0550ae;
+}
+pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
+  color: #0550ae;
+}
+pre.rouge .sb {
+  color: #0550ae;
+}
+pre.rouge .bp {
+  color: #0550ae;
+}
+pre.rouge .ne {
+  color: #0550ae;
+}
+pre.rouge .nl {
+  color: #0550ae;
+}
+pre.rouge .py {
+  color: #0550ae;
+}
+pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
+  color: #0550ae;
+}
+pre.rouge .o, pre.rouge .ow {
+  color: #0550ae;
+}
+pre.rouge .gh {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
+  color: #0a3069;
+}
+pre.rouge .nd {
+  color: #8250df;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #8250df;
+}
+pre.rouge .err {
+  color: #f6f8fa;
+  background-color: #82071e;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
+  color: #6e7781;
+}
+pre.rouge .gl {
+  color: #6e7781;
+}
+pre.rouge .gt {
+  color: #6e7781;
+}
+pre.rouge .ni {
+  color: #24292f;
+}
+pre.rouge .si {
+  color: #24292f;
+}
+pre.rouge .ge {
+  color: #24292f;
+  font-style: italic;
+}
+pre.rouge .gs {
+  color: #24292f;
+  font-weight: bold;
+}
+</style>
+<style>
     pre.rouge .hll {
         background-color: #ffc;
         display: block;
@@ -444,20 +558,203 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     }
 </style>
 </head>
-<body class="article">
+<body class="article toc2 toc-left">
 <div id="header">
-<h1>Index page</h1>
+<h1>SmallRye Health in Quarkus</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_prerequisites">1. Prerequisites</a></li>
+<li><a href="#_creating_the_maven_project">2. Creating the Maven Project</a></li>
+<li><a href="#_first_attempts">3. First attempts</a>
+<ul class="sectlevel2">
+<li><a href="#_start_the_project">3.1. Start the project</a></li>
+<li><a href="#_existing_health_checks_endpoints">3.2. Existing health checks endpoints</a></li>
+<li><a href="#_use_existing_health_checks_endpoints">3.3. Use existing health checks endpoints</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments where automated processes must be able to determine whether the application should be discarded or restarted.</p>
+</div>
+<div class="paragraph">
+<p><strong>In this instruction, i will show you how to use it in Quarkus.</strong></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>1. Prerequisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you need:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Roughly 15 minutes</p>
+</li>
+<li>
+<p>An IDE</p>
+</li>
+<li>
+<p>JDK 17+ installed with JAVA_HOME configured appropriately</p>
+</li>
+<li>
+<p>Apache Maven 3.9.8</p>
+</li>
+<li>
+<p>Optionally the Quarkus CLI if you want to use it</p>
+</li>
+<li>
+<p>Optionally Mandrel or GraalVM installed and configured appropriately if you want to build a native executable (or Docker if you use a native container build)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_creating_the_maven_project"><a class="anchor" href="#_creating_the_maven_project"></a>2. Creating the Maven Project</h2>
+<div class="sectionbody">
 <div class="imageblock">
 <div class="content">
-<img src="images/img.png" alt="img">
+<img src="images/create-project.png" alt="create project">
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+SmallRye Health extension needed
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/required-extensions.png" alt="required extensions">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>or add to existing project</em></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">Quarkus-CLI</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">quarkus ext add io.quarkus:quarkus-smallrye-health</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Maven-Wrapper</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./mvnw quarkus:add-extension <span class="nt">-Dextensions</span><span class="o">=</span><span class="s2">"io.quarkus:quarkus-smallrye-health"</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-smallrye-health<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_first_attempts"><a class="anchor" href="#_first_attempts"></a>3. First attempts</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_start_the_project"><a class="anchor" href="#_start_the_project"></a>3.1. Start the project</h3>
+<div class="listingblock">
+<div class="title">Quarkus-CLI</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">quarkus dev <span class="nt">--clean</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Maven-Wrapper</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./mvnw clean quarkus:dev</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_existing_health_checks_endpoints"><a class="anchor" href="#_existing_health_checks_endpoints"></a>3.2. Existing health checks endpoints</h3>
+<div class="paragraph">
+<p>Importing the smallrye-health extension directly exposes three REST endpoints:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="localhost:8080/q/health/live"><code>/q/health/live</code></a> - The application is up and running.</p>
+</li>
+<li>
+<p><a href="localhost:8080/q/health/ready"><code>/q/health/ready</code></a> - The application is ready to serve requests.</p>
+</li>
+<li>
+<p><a href="localhost:8080/q/health/started"><code>/q/health/started</code></a> - The application is started.</p>
+</li>
+<li>
+<p><a href="localhost:8080/q/health"><code>/q/health</code></a> - Accumulating all health check procedures in the application.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>All health REST endpoints return a simple JSON object with two fields:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>status</code> - the overall result of all the health check procedures</p>
+</li>
+<li>
+<p><code>checks</code> - an array of individual checks</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_use_existing_health_checks_endpoints"><a class="anchor" href="#_use_existing_health_checks_endpoints"></a>3.3. Use existing health checks endpoints</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/q/health/live</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UP"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"checks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alive"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UP"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Now try it yourself with the other existing endpoints :-)</strong></p>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-21 06:53:53 UTC
+Last updated 2024-10-21 07:44:54 UTC
 </div>
 </div>
 </body>
