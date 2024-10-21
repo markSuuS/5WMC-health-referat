@@ -565,12 +565,21 @@ pre.rouge .gs {
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_prerequisites">1. Prerequisites</a></li>
-<li><a href="#_creating_the_maven_project">2. Creating the Maven Project</a></li>
+<li><a href="#_creating_the_maven_project">2. Creating the Maven Project</a>
+<ul class="sectlevel2">
+<li><a href="#_smallrye_health_extension">2.1. SmallRye Health extension</a></li>
+</ul>
+</li>
 <li><a href="#_first_attempts">3. First attempts</a>
 <ul class="sectlevel2">
 <li><a href="#_start_the_project">3.1. Start the project</a></li>
 <li><a href="#_existing_health_checks_endpoints">3.2. Existing health checks endpoints</a></li>
 <li><a href="#_use_existing_health_checks_endpoints">3.3. Use existing health checks endpoints</a></li>
+</ul>
+</li>
+<li><a href="#_individual_health_checks">4. Individual Health Checks</a>
+<ul class="sectlevel2">
+<li><a href="#_liveness_check">4.1. Liveness-Check</a></li>
 </ul>
 </li>
 </ul>
@@ -625,17 +634,14 @@ pre.rouge .gs {
 <img src="images/create-project.png" alt="create project">
 </div>
 </div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-SmallRye Health extension needed
-</td>
-</tr>
-</table>
+<div class="sect2">
+<h3 id="_smallrye_health_extension"><a class="anchor" href="#_smallrye_health_extension"></a>2.1. SmallRye Health extension</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><em>in Wizard:</em></p>
+</li>
+</ul>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -645,7 +651,7 @@ SmallRye Health extension needed
 <div class="ulist">
 <ul>
 <li>
-<p><em>or add to existing project</em></p>
+<p><em>or add to existing project:</em></p>
 </li>
 </ul>
 </div>
@@ -668,6 +674,7 @@ SmallRye Health extension needed
     <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
     <span class="nt">&lt;artifactId&gt;</span>quarkus-smallrye-health<span class="nt">&lt;/artifactId&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -728,19 +735,17 @@ SmallRye Health extension needed
 <div class="sect2">
 <h3 id="_use_existing_health_checks_endpoints"><a class="anchor" href="#_use_existing_health_checks_endpoints"></a>3.3. Use existing health checks endpoints</h3>
 <div class="listingblock">
+<div class="title">Example: Accumulating all health check procedures in the application</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/q/health/live</code></pre>
 </div>
 </div>
 <div class="listingblock">
+<div class="title">Response of /q/health/live</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
     </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UP"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"checks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-        </span><span class="p">{</span><span class="w">
-            </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alive"</span><span class="p">,</span><span class="w">
-            </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UP"</span><span class="w">
-        </span><span class="p">}</span><span class="w">
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span></code></pre>
 </div>
@@ -751,10 +756,106 @@ SmallRye Health extension needed
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_individual_health_checks"><a class="anchor" href="#_individual_health_checks"></a>4. Individual Health Checks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can also create your own health checks to announce the availability of your own program parts using own health check classes.</p>
+</div>
+<div class="sect2">
+<h3 id="_liveness_check"><a class="anchor" href="#_liveness_check"></a>4.1. Liveness-Check</h3>
+<div class="sect3">
+<h4 id="_create_class_livenesscheck"><a class="anchor" href="#_create_class_livenesscheck"></a>4.1.1. Create class <code>LivenessCheck</code></h4>
+<div class="imageblock">
+<div class="content">
+<img src="images/create-class-livenesscheck.png" alt="create class livenesscheck">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_implement_class_livenesscheck"><a class="anchor" href="#_implement_class_livenesscheck"></a>4.1.2. Implement class <code>LivenessCheck</code></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">at.htlleonding.health</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.enterprise.context.ApplicationScoped</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.HealthCheck</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.HealthCheckResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.eclipse.microprofile.health.Liveness</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
+
+<span class="nd">@Liveness</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@ApplicationScoped</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">LivenessCheck</span> <span class="kd">implements</span> <span class="nc">HealthCheck</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">HealthCheckResponse</span> <span class="nf">call</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kt">boolean</span> <span class="n">isUp</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Random</span><span class="o">().</span><span class="na">nextBoolean</span><span class="o">();</span> <i class="conum" data-value="4"></i><b>(4)</b>
+
+        <span class="k">if</span><span class="o">(</span><span class="n">isUp</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="5"></i><b>(5)</b>
+            <span class="k">return</span> <span class="nc">HealthCheckResponse</span><span class="o">.</span><span class="na">up</span><span class="o">(</span><span class="s">"liveness-check"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="nc">HealthCheckResponse</span><span class="o">.</span><span class="na">down</span><span class="o">(</span><span class="s">"liveness-check"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Liveness</code> annotation means that the check is a Liveness-Check and exposes the result on <code>/q/health/live</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It’s recommended to annotate the health check class with <code>@ApplicationScoped</code> so that a single bean instance is used for all health check requests.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Your health check class needs to implement the <code>HealthCheck</code> interface.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>This is the condition whether the check is up or down. Here in the demo example we use a random boolean</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Here you return the name of your health check with <code>HealthCheckResponse.up</code> or <code>HealthCheckResponse.down</code></td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_get_response_of_livenesscheck"><a class="anchor" href="#_get_response_of_livenesscheck"></a>4.1.3. Get response of LivenessCheck</h4>
+<div class="listingblock">
+<div class="title">Accumulating all health check procedures in the application</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/q/health/live</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Response of /q/health/live</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DOWN"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"checks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"liveness-check"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DOWN"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-21 07:44:54 UTC
+Last updated 2024-10-21 08:29:07 UTC
 </div>
 </div>
 </body>
