@@ -1,5 +1,9 @@
 = SmallRye Health in Quarkus
 ifndef::imagesdir[:imagesdir: images]
+:toc:
+:icons: font
+:experimental:
+:sectnums:
 
 SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments where automated processes must be able to determine whether the application should be discarded or restarted.
 
