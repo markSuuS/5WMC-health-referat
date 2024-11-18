@@ -14,6 +14,8 @@ SmallRye Health allows applications to provide information about their state to 
 
 Runtimes that currently use it as their health monitoring implementation include: *Quarkus*, WildFly, Thorntail
 
+Types of healthiness checks: Liveness, Readiness, Startup
+
 https://smallrye.io/docs/smallrye-health/3.0.1/index.html[SmallRye Health Documentation]
 
 *In this instruction, I will show you how to use it in Quarkus.*
@@ -79,9 +81,9 @@ quarkus dev --clean
 
 Importing the smallrye-health extension directly exposes three REST endpoints:
 
-* link:localhost:8080/q/health/live[`/q/health/live`] - The application is up and running.
-* link:localhost:8080/q/health/ready[`/q/health/ready`] - The application is ready to serve requests.
-* link:localhost:8080/q/health/started[`/q/health/started`] - The application is started.
+* link:localhost:8080/q/health/live[`/q/health/live`] - Liveness Checks: The application is up and running.
+* link:localhost:8080/q/health/ready[`/q/health/ready`] - Readiness Checks: The application is ready to serve requests.
+* link:localhost:8080/q/health/started[`/q/health/started`] - Startup Checks: The application is started.
 * link:localhost:8080/q/health[`/q/health`] - Accumulating all health check procedures in the application.
 
 All health REST endpoints return a simple JSON object with two fields:
