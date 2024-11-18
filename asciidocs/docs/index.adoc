@@ -387,15 +387,13 @@ quarkus ext add io.quarkus:quarkus-hibernate-orm-rest-data-panache
 
 === Create the health check for the database connection
 
-NOTE: Unfortunately, JPA/Hibernate and Panache do not have any pre-programmed functions to determine the availability of the database. Therefore, we send a simple native query to the database (SELECT 1) to test whether the connection exists.
-
 ==== Create class `DatabaseHealthCheck`
 
 image::create-class-databasehealthcheck.png[]
 
 ==== Implement class `DatabaseHealthCheck`
 
-[source, java]
+[source,java]
 ----
 package at.htlleonding.health;
 
@@ -428,12 +426,12 @@ public class DatabaseHealthCheck implements HealthCheck {
     }
 }
 ----
-1: for database checks, we use Readiness-Checks
-2: the existing configured database connection will be injected in this variable (java.sql.Datasource dataSource)
-3: we try to get the connection
-4: then it will be checked if the connection is valid
-5: if everything works, it returns a `HealthCheckResponse.up` with `database-connection-active` as name
-6: if something fails, it returns a `HealthCheckResponse.down` with `database-connection-active` as name
+<1> for database checks, we use Readiness-Checks
+<2> the existing configured database connection will be injected in this variable (java.sql.Datasource dataSource)
+<3> we try to get the connection
+<4> then it will be checked if the connection is valid
+<5> if everything works, it returns a `HealthCheckResponse.up` with `database-connection-active` as name
+<6> if something fails, it returns a `HealthCheckResponse.down` with `database-connection-active` as name
 
 === Launch the application and watch the results
 
@@ -481,3 +479,74 @@ curl http://localhost:8080/q/health/ready
 ----
 
 TIP: Surprisingly, in addition to our own implemented database check, there is already a pre-implemented database check by SmallRye
+
+== Integrated Health Monitor
+
+`/q/health-ui` allows you to see your Health Checks in a Web GUI.
+
+image::health-ui.png[]
+
+== Health Checks (Probes) for Kubernetes
+
+You can use these Health Check endpoints for Kubernetes Deployments.
+
+.appsrv.yaml
+[source, yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appsrv
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appsrv
+  template:
+    metadata:
+      labels:
+        app: appsrv
+    spec:
+      containers:
+        - name: appsrv
+          image: ghcr.io/example-user/example-repo/example-image:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          startupProbe: #<1>
+            httpGet:
+              path: /q/health
+              port: 8080
+            timeoutSeconds: 5
+            initialDelaySeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe: #<2>
+            httpGet:
+              path: /q/health
+              port: 8080
+            timeoutSeconds: 5
+            initialDelaySeconds: 60
+            periodSeconds: 120
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appsrv
+
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: appsrv
+----
+<1> In Kubernetes, the `startupProbe` ensures the containerized application starts correctly. It is ideal for applications with long initialization times. If the probe fails, Kubernetes restarts the container. Once it succeeds, other probes, like livenessProbe, take over.
+<2> The `livenessProbe` in Kubernetes checks the container's health during its lifecycle. If it detects a failure, such as a crash or unresponsiveness, Kubernetes restarts the container to maintain application availability.
+
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/[More]
