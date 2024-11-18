@@ -611,6 +611,9 @@ pre.rouge .gs {
 <p>Runtimes that currently use it as their health monitoring implementation include: <strong>Quarkus</strong>, WildFly, Thorntail</p>
 </div>
 <div class="paragraph">
+<p>Types of healthiness checks: Liveness, Readiness, Startup</p>
+</div>
+<div class="paragraph">
 <p><a href="https://smallrye.io/docs/smallrye-health/3.0.1/index.html">SmallRye Health Documentation</a></p>
 </div>
 <div class="paragraph">
@@ -724,13 +727,13 @@ pre.rouge .gs {
 <div class="ulist">
 <ul>
 <li>
-<p><a href="localhost:8080/q/health/live"><code>/q/health/live</code></a> - The application is up and running.</p>
+<p><a href="localhost:8080/q/health/live"><code>/q/health/live</code></a> - Liveness Checks: The application is up and running.</p>
 </li>
 <li>
-<p><a href="localhost:8080/q/health/ready"><code>/q/health/ready</code></a> - The application is ready to serve requests.</p>
+<p><a href="localhost:8080/q/health/ready"><code>/q/health/ready</code></a> - Readiness Checks: The application is ready to serve requests.</p>
 </li>
 <li>
-<p><a href="localhost:8080/q/health/started"><code>/q/health/started</code></a> - The application is started.</p>
+<p><a href="localhost:8080/q/health/started"><code>/q/health/started</code></a> - Startup Checks: The application is started.</p>
 </li>
 <li>
 <p><a href="localhost:8080/q/health"><code>/q/health</code></a> - Accumulating all health check procedures in the application.</p>
@@ -1425,7 +1428,7 @@ Surprisingly, in addition to our own implemented database check, there is alread
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-11-18 11:39:15 UTC
+Last updated 2024-11-18 11:41:07 UTC
 </div>
 </div>
 </body>
