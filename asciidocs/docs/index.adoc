@@ -10,13 +10,18 @@ ifndef::imagesdir[:imagesdir: images]
 
 image::health-logo.png[width=400]
 
-SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments where automated processes must be able to determine whether the application should be discarded or restarted.
-
-Runtimes that currently use it as their health monitoring implementation include: *Quarkus*, WildFly, Thorntail
-
-Types of healthiness checks: Liveness, Readiness, Startup
-
-https://smallrye.io/docs/smallrye-health/3.0.1/index.html[SmallRye Health Documentation]
+* SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments where automated processes must be able to determine whether the application should be discarded or restarted.
+* Runtimes that currently use it as their health monitoring implementation
+** *Quarkus*
+** WildFly
+** Thorntail
+* There are 3 types of checks to check the healthiness of your application
+** Liveness Checks
+** Readiness Checks
+** Startup Checks
+* Also read:
+** https://smallrye.io/docs/smallrye-health/3.0.1/index.html[SmallRye Health Documentation (smallrye.io)]
+** https://quarkus.io/guides/smallrye-health[Smallrye Health (quarkus.io)]
 
 *In this instruction, I will show you how to use it in Quarkus.*
 
