@@ -482,7 +482,7 @@ TIP: Surprisingly, in addition to our own implemented database check, there is a
 
 == Integrated Health Monitor
 
-`/q/health-ui` allows you to see your Health Checks in a Web GUI.
+Route `/q/health-ui` allows you to see your Health Checks in a Web GUI.
 
 image::health-ui.png[]
 
