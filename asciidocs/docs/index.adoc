@@ -1,4 +1,5 @@
 = SmallRye Health in Quarkus
+
 ifndef::imagesdir[:imagesdir: images]
 :stylesheet: adoc.css
 :pdf-style: adoc.css
@@ -7,7 +8,13 @@ ifndef::imagesdir[:imagesdir: images]
 :experimental:
 :sectnums:
 
+image::health-logo.png[width=400]
+
 SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments where automated processes must be able to determine whether the application should be discarded or restarted.
+
+Runtimes that currently use it as their health monitoring implementation include: *Quarkus*, WildFly, Thorntail
+
+https://smallrye.io/docs/smallrye-health/3.0.1/index.html[SmallRye Health Documentation]
 
 *In this instruction, I will show you how to use it in Quarkus.*
 
