@@ -23,13 +23,13 @@ To complete this guide, you need:
 
 == Creating the Maven Project
 
-image::create-project.png[]
+image::create-project.png[width=400]
 
 === SmallRye Health extension
 
 * _in Wizard:_
 
-image::required-extensions.png[]
+image::required-extensions.png[width=400]
 
 * _or add to existing project:_
 
@@ -115,7 +115,7 @@ These checks appear in the endpoint `/q/health/live`
 
 ==== Create class `LivenessCheck`
 
-image::create-class-livenesscheck.png[]
+image::create-class-livenesscheck.png[width=400]
 
 ==== Implement class `LivenessCheck`
 
@@ -180,7 +180,7 @@ These checks appear in the endpoint `/q/health/ready`
 
 ==== Create class `ReadinessCheck`
 
-image::create-class-readinesscheck.png[]
+image::create-class-readinesscheck.png[width=400]
 
 ==== Implement class `ReadinessCheck`
 
@@ -244,7 +244,7 @@ These checks appear in the endpoint `/q/health/started`
 
 ==== Create class `StartupCheck`
 
-image::create-class-startupcheck.png[]
+image::create-class-startupcheck.png[width=400]
 
 ==== Implement class `StartupCheck`
 
@@ -389,7 +389,7 @@ quarkus ext add io.quarkus:quarkus-hibernate-orm-rest-data-panache
 
 ==== Create class `DatabaseHealthCheck`
 
-image::create-class-databasehealthcheck.png[]
+image::create-class-databasehealthcheck.png[width=400]
 
 ==== Implement class `DatabaseHealthCheck`
 
@@ -484,7 +484,7 @@ TIP: Surprisingly, in addition to our own implemented database check, there is a
 
 Route `/q/health-ui` allows you to see your Health Checks in a Web GUI.
 
-image::health-ui.png[]
+image::health-ui.png[width=600]
 
 == Health Checks (Probes) for Kubernetes
 
@@ -549,4 +549,4 @@ spec:
 <1> In Kubernetes, the `startupProbe` ensures the containerized application starts correctly. It is ideal for applications with long initialization times. If the probe fails, Kubernetes restarts the container. Once it succeeds, other probes, like livenessProbe, take over.
 <2> The `livenessProbe` in Kubernetes checks the container's health during its lifecycle. If it detects a failure, such as a crash or unresponsiveness, Kubernetes restarts the container to maintain application availability.
 
-https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/[More]
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/[More about k8s Probes]
