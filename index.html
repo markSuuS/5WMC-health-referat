@@ -326,6 +326,8 @@ pre.rouge .gs {
 <li><a href="#_launch_the_application_and_watch_the_results">5.4. Launch the application and watch the results</a></li>
 </ul>
 </li>
+<li><a href="#_integrated_health_monitor">6. Integrated Health Monitor</a></li>
+<li><a href="#_health_checks_probes_for_kubernetes">7. Health Checks (Probes) for Kubernetes</a></li>
 </ul>
 </div>
 </div>
@@ -916,18 +918,6 @@ quarkus ext add io.quarkus:quarkus-hibernate-orm-rest-data-panache</code></pre>
 </div>
 <div class="sect2">
 <h3 id="_create_the_health_check_for_the_database_connection"><a class="anchor" href="#_create_the_health_check_for_the_database_connection"></a>5.3. Create the health check for the database connection</h3>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Unfortunately, JPA/Hibernate and Panache do not have any pre-programmed functions to determine the availability of the database. Therefore, we send a simple native query to the database (SELECT 1) to test whether the connection exists.
-</td>
-</tr>
-</table>
-</div>
 <div class="sect3">
 <h4 id="_create_class_databasehealthcheck"><a class="anchor" href="#_create_class_databasehealthcheck"></a>5.3.1. Create class <code>DatabaseHealthCheck</code></h4>
 <div class="imageblock">
@@ -972,13 +962,33 @@ Unfortunately, JPA/Hibernate and Panache do not have any pre-programmed function
 <span class="o">}</span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>1: for database checks, we use Readiness-Checks
-2: the existing configured database connection will be injected in this variable (java.sql.Datasource dataSource)
-3: we try to get the connection
-4: then it will be checked if the connection is valid
-5: if everything works, it returns a <code>HealthCheckResponse.up</code> with <code>database-connection-active</code> as name
-6: if something fails, it returns a <code>HealthCheckResponse.down</code> with <code>database-connection-active</code> as name</p>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>for database checks, we use Readiness-Checks</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>the existing configured database connection will be injected in this variable (java.sql.Datasource dataSource)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>we try to get the connection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>then it will be checked if the connection is valid</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>if everything works, it returns a <code>HealthCheckResponse.up</code> with <code>database-connection-active</code> as name</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>if something fails, it returns a <code>HealthCheckResponse.down</code> with <code>database-connection-active</code> as name</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -1043,10 +1053,103 @@ Surprisingly, in addition to our own implemented database check, there is alread
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_integrated_health_monitor"><a class="anchor" href="#_integrated_health_monitor"></a>6. Integrated Health Monitor</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Route <code>/q/health-ui</code> allows you to see your Health Checks in a Web GUI.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/health-ui.png" alt="health ui">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_health_checks_probes_for_kubernetes"><a class="anchor" href="#_health_checks_probes_for_kubernetes"></a>7. Health Checks (Probes) for Kubernetes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use these Health Check endpoints for Kubernetes Deployments.</p>
+</div>
+<div class="listingblock">
+<div class="title">appsrv.yaml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">appsrv</span>
+
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">appsrv</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s">appsrv</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">appsrv</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">ghcr.io/example-user/example-repo/example-image:latest</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">8080</span>
+          <span class="na">startupProbe</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="na">httpGet</span><span class="pi">:</span>
+              <span class="na">path</span><span class="pi">:</span> <span class="s">/q/health</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">15</span>
+          <span class="na">readinessProbe</span><span class="pi">:</span>
+            <span class="na">tcpSocket</span><span class="pi">:</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">10</span>
+          <span class="na">livenessProbe</span><span class="pi">:</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="na">httpGet</span><span class="pi">:</span>
+              <span class="na">path</span><span class="pi">:</span> <span class="s">/q/health</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">60</span>
+            <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">120</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">appsrv</span>
+
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">8080</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">appsrv</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>In Kubernetes, the <code>startupProbe</code> ensures the containerized application starts correctly. It is ideal for applications with long initialization times. If the probe fails, Kubernetes restarts the container. Once it succeeds, other probes, like livenessProbe, take over.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>livenessProbe</code> in Kubernetes checks the container&#8217;s health during its lifecycle. If it detects a failure, such as a crash or unresponsiveness, Kubernetes restarts the container to maintain application availability.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/">More</a></p>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-21 10:43:23 UTC
+Last updated 2024-11-18 11:25:07 UTC
 </div>
 </div>
 </body>
