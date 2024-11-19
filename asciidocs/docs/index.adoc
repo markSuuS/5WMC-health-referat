@@ -10,15 +10,17 @@ ifndef::imagesdir[:imagesdir: images]
 
 image::health-logo.png[width=400]
 
-* SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments where automated processes must be able to determine whether the application should be discarded or restarted.
-* Runtimes that currently use it as their health monitoring implementation
-** *Quarkus*
+== General
+
+* SmallRye Health allows applications to provide information about their state to external viewers which is typically useful in cloud environments (e.g. k8s) where automated processes must be able to determine whether the application should be discarded or restarted.
+* Runtimes that currently use SmallRye Health as their health monitoring implementation
+** *Quarkus* with *quarkus-smallrye-health* extension
 ** WildFly
 ** Thorntail
 * There are 3 types of checks to check the healthiness of your application
-** Liveness Checks
-** Readiness Checks
-** Startup Checks
+** *Liveness* Checks: Determines if the application is still running and not in a failed or unrecoverable state.
+** *Readiness* Checks: Determines if the application is ready to handle incoming requests.
+** *Startup* Checks: Determines if the application has successfully started.
 * Also read:
 ** https://smallrye.io/docs/smallrye-health/3.0.1/index.html[SmallRye Health Documentation (smallrye.io)]
 ** https://quarkus.io/guides/smallrye-health[Smallrye Health (quarkus.io)]
@@ -501,6 +503,8 @@ Route `/q/health-ui` allows you to see your Health Checks in a Web GUI.
 image::health-ui.png[width=600]
 
 == Health Checks (Probes) for Kubernetes
+
+In Kubernetes, a probe is a mechanism used to determine the health and readiness of a container or application running within a pod. Probes are defined in the pod specification and are performed periodically to ensure the proper functioning of the application.
 
 You can use these Health Check endpoints for Kubernetes Deployments.
 
